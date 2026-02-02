@@ -171,22 +171,22 @@ body {
 
 .actions {
   margin-top: 18px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  justify-content: center;
 }
 
 .btn {
-  width: 100%;
   border: 0;
   cursor: pointer;
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 12px 24px;
   font-weight: 900;
   font-size: 18px;
   letter-spacing: 0.01em;
-  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
+  transition: all 200ms ease;
   box-shadow: 0 10px 20px rgba(17, 16, 18, 0.1);
 }
 
@@ -197,16 +197,11 @@ body {
 .btn-yes {
   background: linear-gradient(180deg, rgba(46, 204, 113, 1), rgba(39, 174, 96, 1));
   color: #062113;
-  transform-origin: left center;
-  position: relative;
-  z-index: 2;
 }
 
 .btn-no {
   background: linear-gradient(180deg, rgba(255, 77, 79, 1), rgba(214, 48, 49, 1));
   color: #2a0a0a;
-  position: relative;
-  z-index: 1;
 }
 
 .btn-reveal {

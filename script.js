@@ -21,7 +21,11 @@ const stickerEmoji = document.getElementById("stickerEmoji");
 const stickerHearts = document.getElementById("stickerHearts");
 
 let noCount = 0;
-let yesScale = 1;
+
+// Base sizes for the Yes button
+const BASE_FONT_SIZE = 18;
+const BASE_PADDING_V = 12;
+const BASE_PADDING_H = 24;
 
 const noPhrases = [
   "No",
@@ -53,16 +57,19 @@ function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
-function applyYesScale() {
-  // Keep the button from breaking layout on tiny screens.
-  const scale = clamp(yesScale, 1, 5.2);
-  yesBtn.style.transform = `scale(${scale})`;
-  yesBtn.style.boxShadow = `0 18px 40px rgba(46, 204, 113, ${clamp(
-    0.12 + scale * 0.05,
-    0.12,
-    0.45,
-  )})`;
-  yesBtn.style.filter = scale >= 3 ? "saturate(1.1)" : "none";
+function applyYesSize() {
+  // Grow the Yes button by increasing font-size and padding
+  const growFactor = 1 + noCount * 0.35; // grows ~35% per No click
+  const maxGrow = 3.5;
+  const factor = clamp(growFactor, 1, maxGrow);
+
+  const fontSize = Math.round(BASE_FONT_SIZE * factor);
+  const paddingV = Math.round(BASE_PADDING_V * factor);
+  const paddingH = Math.round(BASE_PADDING_H * factor);
+
+  yesBtn.style.fontSize = `${fontSize}px`;
+  yesBtn.style.padding = `${paddingV}px ${paddingH}px`;
+  yesBtn.style.boxShadow = `0 ${8 + factor * 4}px ${20 + factor * 10}px rgba(46, 204, 113, ${clamp(0.15 + factor * 0.08, 0.15, 0.5)})`;
 }
 
 function updateNoUI() {
