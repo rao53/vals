@@ -34,10 +34,10 @@ const noPhrases = [
   "Wait… what?",
   "Pleaseee?",
   "Ok ok—hear me out",
-  "I’ll be extra nice",
-  "But you’re my favorite",
-  "I’m gonna be so sad",
-  "Fine… I’ll ask again",
+  "I'll be extra nice",
+  "But you're my favorite",
+  "I'm gonna be so sad",
+  "Fine… I'll ask again",
 ];
 
 const subtitlesByNo = [
@@ -47,8 +47,8 @@ const subtitlesByNo = [
   "I can be very convincing.",
   "Imagine cute pics together.",
   "I brought my best puppy eyes.",
-  "I’m not giving up that easily.",
-  "Ok ok, I’m being dramatic.",
+  "I'm not giving up that easily.",
+  "Ok ok, I'm being dramatic.",
   "But I like you… a lot.",
   "One last tiny chance?",
 ];
@@ -80,17 +80,20 @@ function updateNoUI() {
   // Light escalation: after a few "No"s, show the playful badge.
   if (noCount >= 2) badge.hidden = false;
 
-  // Make "No" feel less enticing over time (but still clickable).
-  const noScale = clamp(1 - noCount * 0.06, 0.72, 1);
-  noBtn.style.transform = `scale(${noScale})`;
-  noBtn.style.filter = noCount >= 4 ? "saturate(0.9)" : "none";
+  // Make "No" feel less enticing over time (shrink it a bit).
+  const shrinkFactor = clamp(1 - noCount * 0.08, 0.6, 1);
+  const fontSize = Math.round(BASE_FONT_SIZE * shrinkFactor);
+  const paddingV = Math.round(BASE_PADDING_V * shrinkFactor);
+  const paddingH = Math.round(BASE_PADDING_H * shrinkFactor);
+
+  noBtn.style.fontSize = `${fontSize}px`;
+  noBtn.style.padding = `${paddingV}px ${paddingH}px`;
+  noBtn.style.opacity = noCount >= 4 ? "0.85" : "1";
 }
 
 function onNo() {
   noCount += 1;
-  // Exponential-ish growth that ramps quickly but caps via applyYesScale.
-  yesScale *= noCount < 4 ? 1.22 : 1.3;
-  applyYesScale();
+  applyYesSize();
   updateNoUI();
 
   // Make the sticker react.
@@ -98,11 +101,46 @@ function onNo() {
   if (noCount >= 5) stickerEmoji.textContent = "😭";
 }
 
-function onYes() {
-  // Reset transforms so layout doesn’t look weird on the next screen.
-  yesBtn.style.transform = "";
-  noBtn.style.transform = "";
+function createConfetti() {
+  const colors = ['#ff6b9d', '#ff5aa5', '#4facfe', '#a8edea', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6'];
+  const shapes = ['circle', 'square', 'triangle'];
+  
+  for (let i = 0; i < 80; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti-piece';
+    
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const left = Math.random() * 100;
+    const drift = (Math.random() - 0.5) * 200;
+    const delay = Math.random() * 0.5;
+    const duration = 2 + Math.random() * 2;
+    
+    confetti.style.left = `${left}%`;
+    confetti.style.setProperty('--drift', `${drift}px`);
+    confetti.style.animationDelay = `${delay}s`;
+    confetti.style.animationDuration = `${duration}s`;
+    confetti.style.backgroundColor = color;
+    
+    if (shape === 'circle') {
+      confetti.style.borderRadius = '50%';
+    } else if (shape === 'triangle') {
+      confetti.style.width = '0';
+      confetti.style.height = '0';
+      confetti.style.backgroundColor = 'transparent';
+      confetti.style.borderLeft = '6px solid transparent';
+      confetti.style.borderRight = '6px solid transparent';
+      confetti.style.borderBottom = `12px solid ${color}`;
+    }
+    
+    document.body.appendChild(confetti);
+    
+    // Remove after animation
+    setTimeout(() => confetti.remove(), (delay + duration) * 1000 + 100);
+  }
+}
 
+function onYes() {
   title.textContent = "Yessss!";
   subtitle.textContent = "You just made me so happy.";
   actions.hidden = true;
@@ -110,18 +148,20 @@ function onYes() {
 
   stickerEmoji.textContent = "🐻‍❄️";
   stickerHearts.hidden = false;
+  
+  // Confetti celebration!
+  createConfetti();
 }
 
 function onReveal() {
   after.hidden = true;
   plan.hidden = false;
-  title.textContent = "Ok, here’s the plan";
+  title.textContent = "Ok, here's the plan";
   subtitle.textContent = "A sweet little date—just us.";
 }
 
 function onRestart() {
   noCount = 0;
-  yesScale = 1;
 
   badge.hidden = true;
   stickerHearts.hidden = true;
@@ -134,12 +174,14 @@ function onRestart() {
   after.hidden = true;
   plan.hidden = true;
 
-  yesBtn.style.transform = "";
-  yesBtn.style.filter = "";
+  // Reset button styles to default
+  yesBtn.style.fontSize = "";
+  yesBtn.style.padding = "";
   yesBtn.style.boxShadow = "";
 
-  noBtn.style.transform = "";
-  noBtn.style.filter = "";
+  noBtn.style.fontSize = "";
+  noBtn.style.padding = "";
+  noBtn.style.opacity = "";
   noBtn.textContent = "No";
 }
 
@@ -148,6 +190,6 @@ yesBtn.addEventListener("click", onYes);
 revealBtn.addEventListener("click", onReveal);
 restartBtn.addEventListener("click", onRestart);
 
-// Initialize deterministic UI.
-applyYesScale();
+// Initialize UI.
+applyYesSize();
 updateNoUI();
