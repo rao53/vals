@@ -145,6 +145,7 @@ function onYes() {
   subtitle.textContent = "You just made me so happy.";
   actions.hidden = true;
   after.hidden = false;
+  badge.hidden = true;
 
   stickerEmoji.textContent = "🐻‍❄️";
   stickerHearts.hidden = false;
